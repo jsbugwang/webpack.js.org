@@ -12,11 +12,12 @@ contributors:
   - snitin315
   - rahul3v
   - jamesgeorge007
+  - jsbugwang
 ---
 
 插件向第三方开发者提供了 webpack 引擎中完整的能力。使用阶段式的构建回调，开发者可以引入它们自己的行为到 webpack 构建流程中。创建插件比创建 loader 更加高级，因为你将需要理解一些 webpack 底层的内部特性来做相应的钩子，所以做好阅读一些源码的准备！
 
-## 创建插件 $#创建插件$
+## 创建插件 $#creating-a-plugin$
 
 webpack 插件由以下组成：
 
@@ -51,7 +52,7 @@ class MyExampleWebpackPlugin {
 }
 ```
 
-## 基本插件架构 $#基本插件架构$
+## 基本插件架构 $#basic-plugin-architecture$
 
 插件是由「具有 `apply` 方法的 prototype 对象」所实例化出来的。这个 `apply` 方法在安装插件时，会被 webpack compiler 调用一次。`apply` 方法可以接收一个 webpack compiler 对象的引用，从而可以在回调函数中访问到 compiler 对象。一个简单的插件结构如下：
 
@@ -112,7 +113,7 @@ export default class HelloWorldPlugin {
 }
 ```
 
-## Compiler 和 Compilation $#Compiler和Compilation$
+## Compiler 和 Compilation $#compiler-and-compilation$
 
 在插件开发中最重要的两个资源就是 [`compiler`](/api/node/#compiler-instance) 和 [`compilation`](/api/compilation-hooks/) 对象。理解它们的角色是扩展 webpack 引擎重要的第一步。
 
@@ -183,7 +184,7 @@ class HelloAsyncPlugin {
 module.exports = HelloAsyncPlugin;
 ```
 
-## 示例 $#示例$
+## 示例 $#example$
 
 一旦能我们深入理解 webpack compiler 和每个独立的 compilation，我们依赖 webpack 引擎将有无限多的事可以做。我们可以重新格式化已有的文件，创建衍生的文件，或者制作全新的生成文件。
 
@@ -291,7 +292,7 @@ T> 我们使用 `tap()` 方法来绑定 `processAssets` 钩子，是因为上例
 
 T> [`processAssets`](/api/compilation-hooks/#processassets) 钩子还支持 `additionalAssets` 属性，不仅支持自定义插件拦截其他插件在当前阶段之前添加的资源，还支持当前阶段之后添加的资源。这样可以拦截 compilation 中的所有资源。不过这个例子在 `SUMMARIZE` 阶段捕获之前阶段生成的所有资源就够了（因为这些资源就是所有的了）。
 
-## 插件的不同类型 $#插件的不同类型$
+## 插件的不同类型 $#different-plugin-shapes$
 
 webpack 插件可以按照它所注册的事件分成不同的类型。每一个事件钩子决定了它该如何应用插件的注册。
 
@@ -366,6 +367,6 @@ this.hooks = {
   - 用 `callAsync(...params)` 方法调用。
 
 
-### 默认配置 $#默认配置$
+### 默认配置 $#configuration-defaults$
 
 Webpack 先应用插件的默认配置，再应用自身的默认配置。这样可以让插件拥有自己的默认配置，同时支持实现创建预设配置的插件。
