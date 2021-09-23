@@ -12,6 +12,7 @@ contributors:
   - snitin315
   - rahul3v
   - jamesgeorge007
+translators:
   - jsbugwang
 ---
 
@@ -86,7 +87,6 @@ module.exports = {
 ```
 
 使用 [`schema-utils`](https://github.com/webpack/schema-utils) 来校验传入插件的选项。这里是个例子：
-
 
 ```javascript
 import { validate } from 'schema-utils';
@@ -196,7 +196,8 @@ class FileListPlugin {
     outputFile: 'assets.md',
   };
 
-  // 需要传入自定义插件构造函数的任意选项（这是自定义插件的公开API）
+  // 需要传入自定义插件构造函数的任意选项
+  //（这是自定义插件的公开API）
   constructor(options = {}) {
     // 在应用默认选项前，先应用用户指定选项
     // 合并后的选项暴露给插件方法
@@ -206,41 +207,46 @@ class FileListPlugin {
 
   apply(compiler) {
     const pluginName = FileListPlugin.name;
-
     
-    // webpack 模块实例，可以通过 compiler 对象访问，这样确保使用的是模块的正确版本
+    // webpack 模块实例，可以通过 compiler 对象访问，
+    // 这样确保使用的是模块的正确版本
     // （不要直接 require/import webpack）
     const { webpack } = compiler;
 
     // Compilation 对象提供了对一些有用常量的访问。
     const { Compilation } = webpack;
 
-    // RawSource 是其中一种 “源码”("sources") 类型，用来在 compilation 中表示资源的源码
+    // RawSource 是其中一种 “源码”("sources") 类型，
+    // 用来在 compilation 中表示资源的源码
     const { RawSource } = webpack.sources;
 
-
-    // 绑定到 “thisCompilation” 钩子，以便进一步绑定到 compilation 过程更早期的阶段
+    // 绑定到 “thisCompilation” 钩子，
+    // 以便进一步绑定到 compilation 过程更早期的阶段
     compiler.hooks.thisCompilation.tap(pluginName, (compilation) => {
       // 绑定到资源处理流水线(assets processing pipeline)
       compilation.hooks.processAssets.tap(
         {
           name: pluginName,
 
-          // 用某个靠后的资源处理阶段，确保所有资源已被插件添加到 compilation
+          // 用某个靠后的资源处理阶段，
+          // 确保所有资源已被插件添加到 compilation
           stage: Compilation.PROCESS_ASSETS_STAGE_SUMMARIZE,
         },
         (assets) => {
           // "assets" 是一个包含 compilation 中所有资源(assets)的对象。
-          // 该对象的键是资源的路径，值是文件的源码
+          // 该对象的键是资源的路径，
+          // 值是文件的源码
 
-          // 遍历所有资源，生成 Markdown 文件的内容
+          // 遍历所有资源，
+          // 生成 Markdown 文件的内容
           const content =
             '# In this build:\n\n' +
             Object.keys(assets)
               .map((filename) => `- ${filename}`)
               .join('\n');
 
-          // 向 compilation 添加新的资源，这样 webpack 就会自动生成并输出到 output 目录
+          // 向 compilation 添加新的资源，
+          // 这样 webpack 就会自动生成并输出到 output 目录
           compilation.emitAsset(
             this.options.outputFile,
             new RawSource(content)
@@ -289,14 +295,11 @@ module.exports = {
 
 T> 我们使用 `tap()` 方法来绑定 `processAssets` 钩子，是因为上例中不需要执行任何异步操作。不过 `processAssets` 钩子是一个异步钩子，因此需要的时候也可用 `tapPromise()` 或 `tapAsync()` 方法。
 
-
 T> [`processAssets`](/api/compilation-hooks/#processassets) 钩子还支持 `additionalAssets` 属性，不仅支持自定义插件拦截其他插件在当前阶段之前添加的资源，还支持当前阶段之后添加的资源。这样可以拦截 compilation 中的所有资源。不过这个例子在 `SUMMARIZE` 阶段捕获之前阶段生成的所有资源就够了（因为这些资源就是所有的了）。
 
 ## 插件的不同类型 $#different-plugin-shapes$
 
-webpack 插件可以按照它所注册的事件分成不同的类型。每一个事件钩子决定了它该如何应用插件的注册。
-
-每一个事件钩子都预先定义为同步、异步、瀑布、并行钩子，钩子在内部用 call/callAsync 方法调用。支持的钩子清单或可被绑定的钩子清单，通常在 `this.hooks` 属性指定。
+webpack 插件可以按照它所注册的事件分成不同的类型。每一个事件钩子都预先定义为同步、异步、瀑布或并行钩子，钩子在内部用 call/callAsync 方法调用。支持的钩子清单或可被绑定的钩子清单，通常在 `this.hooks` 属性指定。
 
 例如:
 
@@ -343,7 +346,8 @@ this.hooks = {
   - 用 `tap`/`tapAsync`/`tapPromise` 方法绑定。
   - 用 `callAsync(...params)` 方法调用。
 
-  插件处理函数(handler functions)的参数为所有参数，以及一个签名为 `(err?: Error) -> void` 的 callback 函数，callback 函数的 。处理函数按注册顺序执行。`callback` 在所有处理函数执行完后调用。这是 `emit` 和 `run` 事件的常见使用模式。
+  插件处理函数(handler functions)的参数为所有参数，以及一个签名为 `(err?: Error) -> void` 的 callback 函数，callback 函数的 。处理函数按注册顺序执行。`callback` 在所有处理函数执行完后调用。
+  这是 `emit` 和 `run` 事件的常见使用模式。
 
 - **Async waterfall(异步瀑布)** 插件会用 waterfall 方式异步应用
 
@@ -351,8 +355,8 @@ this.hooks = {
   - 用 `tap`/`tapAsync`/`tapPromise` 方法绑定。
   - 用 `callAsync(...params)` 方法调用。
 
-  插件处理函数的参数为当前值，以及一个签名为 `(err: Error, nextValue: any) -> void` 的 callback 函数。调用时 `nextValue` 是下一个处理函数的当前值。第一个处理函数的当前是只 `init` 。当所有 handler 都执行后，callback执行，参数为最后一个值。任一个 handler 传入 `err` 值，停止调用 handler 且 callback 被调用。这种模式在 `before-resolve` 和 `after-resolve` 事件中常见。
-
+  插件处理函数的参数为当前值，以及一个签名为 `(err: Error, nextValue: any) -> void` 的 callback 函数。调用时 `nextValue` 是下一个处理函数的当前值。第一个处理函数的当前是只 `init` 。当所有 handler 都执行后，callback执行，参数为最后一个值。任一个 handler 传入 `err` 值，停止调用 handler 且 callback 被调用。
+  这种模式在 `before-resolve` 和 `after-resolve` 事件中常见。
 
 - **Async Series Bail**
 
@@ -365,7 +369,6 @@ this.hooks = {
   - 通过 `new AsyncParallelHook([params])` 定义。
   - 用 `tap`/`tapAsync`/`tapPromise` 方法绑定。
   - 用 `callAsync(...params)` 方法调用。
-
 
 ### 默认配置 $#configuration-defaults$
 
