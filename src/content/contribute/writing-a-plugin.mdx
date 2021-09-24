@@ -335,8 +335,8 @@ this.hooks = {
   - 用 `tap` 方法绑定。
   - 用 `call(...params)` 方法调用。
 
-  该类型的插件是一个接一个串行执行，前一个的返回值作为后一个的入参。插件需要考虑执行的顺序，因为后一个插件必须接受前一个插件执行的结果作为入参。第一个插件的参数为 `init` 。所以 waterfall 钩子至少要制定一个参数。这种模式用于和 `ModuleTemplate`，`ChunkTemplate` 等 webpack 模板相关的 Tapable 实例。
-
+  该类型的插件是一个接一个串行执行，前一个的返回值作为后一个的入参。插件需要考虑执行的顺序，因为后一个插件必须接受前一个插件执行的结果作为入参。第一个插件的参数为 `init` 。
+  所以 waterfall 钩子至少要制定一个参数。这种模式用于和 `ModuleTemplate`，`ChunkTemplate` 等 webpack 模板相关的 Tapable 实例。
 
 ### Asynchronous(异步) Hooks $#asynchronous-hooks$
 
