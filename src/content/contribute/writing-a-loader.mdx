@@ -18,7 +18,7 @@ loader 是导出为一个函数的 node 模块。该函数在 loader 转换资�
 
 在深入研究不同 loader 以及他们的用法和例子之前，我们先看三种本地开发测试的方法。
 
-匹配(test)单个 loader，你可以通过在 rule 对象设置 path.resolve 指向这个本地文件：
+匹配(test)单个 loader，你可以通过在 rule 对象使用 `path.resolve` 指定一个本地文件：
 
 **webpack.config.js**
 
