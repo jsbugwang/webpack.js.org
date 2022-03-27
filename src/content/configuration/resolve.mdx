@@ -177,6 +177,8 @@ module.exports = {
 
 ### resolve.cacheWithContext $#resolvecachewithcontext$
 
+`boolean`
+
 如果启用了不安全缓存，请在缓存键(cache key)中引入 `request.context`。这个选项被 [`enhanced-resolve`](https://github.com/webpack/enhanced-resolve/) 模块考虑在内。从 webpack 3.1.0 开始，在配置了 resolve 或 resolveLoader 插件时，解析缓存(resolve caching)中的上下文(context)会被忽略。这解决了性能衰退的问题。
 
 ### resolve.conditionNames $#resolveconditionnames$
@@ -264,8 +266,11 @@ module.exports = {
     extensions: ['.ts', '...'],
   },
 };
+```
 
 ### resolve.fallback $#resolvefallback$
+
+`object`
 
 当正常解析失败时，重定向模块请求。
 
@@ -467,6 +472,23 @@ module.exports = {
 
 W> 修改缓存路径可能在极少数情况下导致失败。
 
+### resolve.useSyncFileSystemCalls $#resolveusesyncfilesystemcalls$
+
+`boolean`
+
+对 resolver 使用同步文件系统调用。
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  //...
+  resolve: {
+    useSyncFileSystemCalls: true,
+  },
+};
+```
+
 ### resolve.plugins $#resolveplugins$
 
 [`[Plugin]`](/plugins/)
@@ -522,7 +544,7 @@ const a = new URL('./module/path', import.meta.url);
 
 解析时，首选的绝对路径为 [`resolve.roots`](#resolveroots)。
 
-**wepack.config.js**
+**webpack.config.js**
 
 ```js
 module.exports = {

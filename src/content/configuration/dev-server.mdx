@@ -41,7 +41,7 @@ W> `webpack-dev-server v4.0.0+` 要求 `node >= v12.13.0`、`webpack >= v4.37.0`
 **webpack.config.js**
 
 ```javascript
-var path = require('path');
+const path = require('path');
 
 module.exports = {
   //...
@@ -87,7 +87,13 @@ T> 当启动本地服务的时候 HTML 模板是必须提供的，通常是 `ind
 npx webpack serve
 ```
 
-CLI 配置项列表可以在 [这里](hhttps://github.com/webpack/webpack-cli/blob/master/SERVE-OPTIONS-v4.md) 查询。
+CLI 配置项列表可以在 [这里](https://github.com/webpack/webpack-cli/blob/master/SERVE-OPTIONS-v4.md) 查询。
+
+### Usage via API $#usageviaapi$
+
+虽然推荐通过 CLI 运行 `webpack-dev-server`，但是你也可以通过 API 来启用服务器。
+
+查看相关的 [`webpack-dev-server` API 文档](/api/webpack-dev-server/)。
 
 ## devServer.allowedHosts $#devserverallowedhosts$
 
@@ -329,6 +335,71 @@ npx webpack serve --client-progress
 npx webpack serve --no-client-progress
 ```
 
+### reconnect $#reconnect$
+
+`boolean = true` `number`
+
+<Badge text="v4.4.0+" />
+
+告诉 dev-server 它应该尝试重新连接客户端的次数。当为 `true` 时，它将无限次尝试重新连接。
+
+**webpack.config.js**
+
+```javascript
+module.exports = {
+  //...
+  devServer: {
+    client: {
+      reconnect: true,
+    },
+  },
+};
+```
+
+通过 CLI 使用：
+
+```bash
+npx webpack serve --client-reconnect
+```
+
+当设置为 `false` 时，它将不会尝试连接。
+
+```javascript
+module.exports = {
+  //...
+  devServer: {
+    client: {
+      reconnect: false,
+    },
+  },
+};
+```
+
+通过 CLI 使用：
+
+```bash
+npx webpack serve --no-client-reconnect
+```
+
+您还可以指定客户端应该尝试重新连接的确切次数。
+
+```javascript
+module.exports = {
+  //...
+  devServer: {
+    client: {
+      reconnect: 5,
+    },
+  },
+};
+```
+
+通过 CLI 使用：
+
+```bash
+npx webpack serve --client-reconnect 5
+```
+
 ### webSocketTransport $#websockettransport$
 
 `'ws' | 'sockjs'` `string`
@@ -491,7 +562,7 @@ module.exports = {
   devServer: {
     devMiddleware: {
       index: true,
-      mimeTypes: { 'text/html': ['phtml'] },
+      mimeTypes: { phtml: 'text/html' },
       publicPath: '/publicPathForDevServe',
       serverSideRender: true,
       writeToDisk: true,
@@ -536,6 +607,8 @@ npx webpack serve --no-http2
 **webpack.config.js**
 
 ```javascript
+const fs = require('fs');
+
 module.exports = {
   //...
   devServer: {
@@ -543,7 +616,7 @@ module.exports = {
     https: {
       key: fs.readFileSync('/path/to/server.key'),
       cert: fs.readFileSync('/path/to/server.crt'),
-      cacert: fs.readFileSync('/path/to/ca.pem'),
+      ca: fs.readFileSync('/path/to/ca.pem'),
     },
   },
 };
@@ -552,14 +625,16 @@ module.exports = {
 要通过 CLI 使用你的证书，请使用以下配置项：
 
 ```bash
-npx webpack serve --http2 --https-key ./path/to/server.key --https-cert ./path/to/server.crt --https-cacert ./path/to/ca.pem
+npx webpack serve --http2 --https-key ./path/to/server.key --https-cert ./path/to/server.crt --https-ca ./path/to/ca.pem
 ```
+
+W> 此配置项已被弃用，以支持 [devServer.server](#devserverserver)。
 
 ## devServer.https $#devserverhttps$
 
 `boolean` `object`
 
-默认情况下，开发服务器将通过 HTTP 提供服务。可以选择使用 HTTPS 通过 HTTP/2 提供服务：
+默认情况下，开发服务器将通过 HTTP 提供服务。可以选择使用 HTTPS 提供服务：
 
 **webpack.config.js**
 
@@ -592,10 +667,10 @@ npx webpack serve --no-https
 module.exports = {
   devServer: {
     https: {
-      cacert: './server.pem',
-      pfx: './server.pfx',
-      key: './server.key',
-      cert: './server.crt',
+      ca: './path/to/server.pem',
+      pfx: './path/to/server.pfx',
+      key: './path/to/server.key',
+      cert: './path/to/server.crt',
       passphrase: 'webpack-dev-server',
       requestCert: true,
     },
@@ -608,7 +683,7 @@ module.exports = {
 要通过 CLI 使用自己的证书，请使用以下选项：
 
 ```bash
-npx webpack serve --https-key ./path/to/server.key --https-cert ./path/to/server.crt --https-cacert ./path/to/ca.pem
+npx webpack serve --https-request-cert --https-key ./path/to/server.key --https-cert ./path/to/server.crt --https-ca ./path/to/ca.pem --https-pfx ./path/to/server.pfx --https-passphrase webpack-dev-server
 ```
 
 `webpack-dev-server >= v4.2.0` 允许你设置额外的 [TLS 配置项](https://nodejs.org/api/tls.html#tls_tls_createsecurecontext_options)，比如 `minVersion`。同样你可以直接传递各自文件的内容：
@@ -636,9 +711,11 @@ module.exports = {
 
 W> 不要同时指定 `https.ca` 与 `https.cacert` 配置项，如果指定的话将会使用 `https.ca`。`https.cacert` 已弃用并且将会在下个主要版本中被移除。
 
+W> 该配置项已弃用，以支持 [devServer.server](#devserverserver)。
+
 ## devServer.headers $#devserverheaders$
 
-`function` `object`
+`array` `function` `object`
 
 为所有响应添加 headers：
 
@@ -651,6 +728,28 @@ module.exports = {
     headers: {
       'X-Custom-Foo': 'bar',
     },
+  },
+};
+```
+
+你也可以传递一个数组：
+
+**webpack.config.js**
+
+```javascript
+module.exports = {
+  //...
+  devServer: {
+    headers: [
+      {
+        key: 'X-Custom',
+        value: 'foo',
+      },
+      {
+        key: 'Y-Custom',
+        value: 'bar',
+      },
+    ],
   },
 };
 ```
@@ -834,7 +933,7 @@ module.exports = {
 npx webpack serve --hot only
 ```
 
-T> 注意 [`webpack.HotModuleReplacementPlugin`](/plugins/hot-module-replacement-plugin/) 是需要的以完全启用 HMR。如果 `webpack` 或者 `webpack-dev-server` 使用 `--hot` 选项启动，该插件会自动添加，因此你可能不需要将其添加到你的 `webpack.config.js` 中。关于更多信息可以查看 [HMR concepts page](/concepts/hot-module-replacement/)。
+T> 从 webpack-dev-server v4 开始，HMR 是默认启用的。它会自动应用 [`webpack.HotModuleReplacementPlugin`](/plugins/hot-module-replacement-plugin/)，这是启用 HMR 所必需的。因此当 `hot` 设置为 `true` 或者通过 CLI 设置 `--hot`，你不需要在你的 `webpack.config.js` 添加该插件。查看 [HMR concepts page](/concepts/hot-module-replacement/) 以获取更多信息。
 
 ## devServer.ipc $#devserveripc$
 
@@ -964,6 +1063,8 @@ module.exports = {
 };
 ```
 
+W> 该配置项已弃用，以支持 [devServer.setupMiddlewares](#devserversetupmiddlewares)。
+
 ## devServer.onBeforeSetupMiddleware $#devserveronbeforesetupmiddleware$
 
 `function (devServer)`
@@ -991,6 +1092,8 @@ module.exports = {
 };
 ```
 
+W> 该配置项已弃用，以支持 [devServer.setupMiddlewares](#devserversetupmiddlewares)。
+
 ## devserver.onListening $#devserveronlistening$
 
 `function (devServer)`
@@ -1017,7 +1120,7 @@ module.exports = {
 
 ## devServer.open $#devserveropen$
 
-`boolean` `string` `[string]` `object` `[object]`
+`boolean` `string` `object` `[string, object]`
 
 告诉 dev-server 在服务器已经启动后打开浏览器。设置其为 `true` 以打开你的默认浏览器。
 
@@ -1315,6 +1418,129 @@ module.exports = {
 };
 ```
 
+## devServer.server $#devserverserver$
+
+`'http' | 'https' | 'spdy'` `string` `object`
+
+<Badge text="v4.4.0+" />
+
+允许设置服务器和配置项（默认为 'http'）。
+
+**webpack.config.js**
+
+```javascript
+module.exports = {
+  //...
+  devServer: {
+    server: 'http',
+  },
+};
+```
+
+通过 CLI 使用：
+
+```bash
+npx webpack serve --server-type http
+```
+
+使用自签名证书通过 `HTTPS` 提供服务：
+
+**webpack.config.js**
+
+```javascript
+module.exports = {
+  //...
+  devServer: {
+    server: 'https',
+  },
+};
+```
+
+通过 CLI 使用：
+
+```bash
+npx webpack serve --server-type https
+```
+
+使用 [spdy](https://www.npmjs.com/package/spdy) 使用自签名证书通过 `HTTP/2` 提供服务：
+
+**webpack.config.js**
+
+```javascript
+module.exports = {
+  //...
+  devServer: {
+    server: 'spdy',
+  },
+};
+```
+
+通过 CLI 使用：
+
+```bash
+npx webpack serve --server-type spdy
+```
+
+W> 该配置项在 Node 15.0.0 及以上的版本会被忽略，因为 [spdy 在这些版本中不会正常工作](https://github.com/spdy-http2/node-spdy/issues/380)。一旦 [Express](https://expressjs.com/) 支持 Node 内建 HTTP/2，dev server 会进行迁移。
+
+使用对象语法提供自己的证书：
+
+**webpack.config.js**
+
+```javascript
+module.exports = {
+  //...
+  devServer: {
+    server: {
+      type: 'https',
+      options: {
+        ca: './path/to/server.pem',
+        pfx: './path/to/server.pfx',
+        key: './path/to/server.key',
+        cert: './path/to/server.crt',
+        passphrase: 'webpack-dev-server',
+        requestCert: true,
+      },
+    },
+  },
+};
+```
+
+通过 CLI 使用：
+
+```bash
+npx webpack serve --server-type https --server-options-key ./path/to/server.key --server-options-cert ./path/to/server.crt --server-options-ca ./path/to/ca.pem --server-options-passphrase webpack-dev-server
+```
+
+It also allows you to set additional [TLS options](https://nodejs.org/api/tls.html#tls_tls_createsecurecontext_options) like `minVersion` and you can directly pass the contents of respective files:
+
+**webpack.config.js**
+
+```javascript
+const fs = require('fs');
+const path = require('path');
+
+module.exports = {
+  //...
+  devServer: {
+    server: {
+      type: 'https',
+      options: {
+        minVersion: 'TLSv1.1',
+        key: fs.readFileSync(path.join(__dirname, './server.key')),
+        pfx: fs.readFileSync(path.join(__dirname, './server.pfx')),
+        cert: fs.readFileSync(path.join(__dirname, './server.crt')),
+        ca: fs.readFileSync(path.join(__dirname, './ca.pem')),
+        passphrase: 'webpack-dev-server',
+        requestCert: true,
+      },
+    },
+  },
+};
+```
+
+W> 如果指定的 `server.options.ca` 将会被使用的话，不要同时指定 `server.options.ca` 与 `server.options.cacert` 配置项。`server.options.cacert` 已弃用并且会在下一个大版本中移除。
+
 ## devServer.setupExitSignals $#devserversetupexitsignals$
 
 `boolean = true`
@@ -1332,9 +1558,64 @@ module.exports = {
 };
 ```
 
+## devServer.setupMiddlewares $#devserversetupmiddlewares$
+
+`function (middlewares, devServer)`
+
+<Badge text="v4.7.0+" />
+
+提供执行自定义函数和应用自定义中间件的能力。
+
+**webpack.config.js**
+
+```javascript
+module.exports = {
+  // ...
+  devServer: {
+    setupMiddlewares: (middlewares, devServer) => {
+      if (!devServer) {
+        throw new Error('webpack-dev-server is not defined');
+      }
+
+      devServer.app.get('/setup-middleware/some/path', (_, response) => {
+        response.send('setup-middlewares option GET');
+      });
+
+      // 如果你想在所有其他中间件之前运行一个中间件或者当你从 `onBeforeSetupMiddleware` 配置项迁移时，
+      // 可以使用 `unshift` 方法
+      middlewares.unshift({
+        name: 'fist-in-array',
+        // `path` 是可选的
+        path: '/foo/path',
+        middleware: (req, res) => {
+          res.send('Foo!');
+        },
+      });
+
+      // 如果你想在所有其他中间件之后运行一个中间件或者当你从 `onAfterSetupMiddleware` 配置项迁移时，
+      // 可以使用 `push` 方法
+      middlewares.push({
+        name: 'hello-world-test-one',
+        // `path` 是可选的
+        path: '/foo/bar',
+        middleware: (req, res) => {
+          res.send('Foo Bar!');
+        },
+      });
+
+      middlewares.push((req, res) => {
+        res.send('Hello World!');
+      });
+
+      return middlewares;
+    },
+  },
+};
+```
+
 ## devServer.static $#devserverstatic$
 
-`boolean` `string` `[string]` `object` `[object]`
+`boolean` `string` `object` `[string, object]`
 
 该配置项允许配置从目录提供静态文件的选项（默认是 'public' 文件夹）。将其设置为 `false` 以禁用：
 
@@ -1446,6 +1727,8 @@ T> 推荐使用绝对路径。
 
 ### staticOptions
 
+`object`
+
 可以配置从 [`static.directory`](#directory) 提供静态文件的高级选项。关于可用配置项可以插件 [Express 文档](http://expressjs.com/en/4x/api.html#express.static)。
 
 **webpack.config.js**
@@ -1549,7 +1832,7 @@ npx webpack serve --no-static-serve-index
 
 `boolean` `object`
 
-通过 [`static.directory`](#directory) 配置项告诉 dev-server 监听文件。默认关闭。当启用时，文件更改将触发整个页面重新加载。
+通过 [`static.directory`](#directory) 配置项告诉 dev-server 监听文件。默认启用，文件更改将触发整个页面重新加载。可以通过将 `watch` 设置为 `false` 禁用。
 
 **webpack.config.js**
 
@@ -1561,7 +1844,7 @@ module.exports = {
   devServer: {
     static: {
       directory: path.join(__dirname, 'public'),
-      watch: true,
+      watch: false,
     },
   },
 };
@@ -1602,7 +1885,7 @@ module.exports = {
 
 ## devServer.watchFiles $#devserverwatchfiles$
 
-`string` `[string]` `object` `[object]`
+`string` `object` `[string, object]`
 
 该配置项允许你配置 globs/directories/files 来监听文件变化。例如：
 

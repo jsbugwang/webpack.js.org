@@ -6,6 +6,7 @@ contributors:
   - wizardofhogwarts
   - chenxsan
   - anshumanv
+  - snitin315
 translators:
   - lcxfs1991
   - QC-L
@@ -21,15 +22,17 @@ W> 由于实验特性具有相对 宽松的语义版本，可能会有重大的�
 
 Available options:
 
-- `asyncWebAssembly`: Support the new WebAssembly according to the [updated specification](https://github.com/WebAssembly/esm-integration), it makes a WebAssembly module an async module.
+- `asyncWebAssembly`: Support the new WebAssembly according to the [updated specification](https://github.com/WebAssembly/esm-integration), it makes a WebAssembly module an async module. And it is enabled by default when [`experiments.futureDefaults`](#experimentsfuturedefaults) is set to `true`.
+- [`backCompat`](#experimentsbackcompat)
 - [`buildHttp`](#experimentsbuildhttp)
 - [`cacheUnaffected`](#experimentscacheunaffected)
+- [`css`](#experimentscss)
 - [`futureDefaults`](#experimentsfuturedefaults)
 - `layers`: Enable module and chunk layers.
 - [`lazyCompilation`](#experimentslazycompilation)
 - [`outputModule`](#experimentsoutputmodule)
 - `syncWebAssembly`: Support the old WebAssembly like in webpack 4.
-- `topLevelAwait`: Support the [Top Level Await Stage 3 proposal](https://github.com/tc39/proposal-top-level-await), it makes the module an async module when `await` is used on the top-level.
+- `topLevelAwait`: Support the [Top Level Await Stage 3 proposal](https://github.com/tc39/proposal-top-level-await), it makes the module an async module when `await` is used on the top-level. And it is enabled by default when [`experiments.futureDefaults`](#experimentsfuturedefaults) is set to `true`.
 
 **webpack.config.js**
 
@@ -39,12 +42,26 @@ module.exports = {
   experiments: {
     asyncWebAssembly: true,
     buildHttp: true,
-    executeModule: true,
     layers: true,
     lazyCompilation: true,
     outputModule: true,
     syncWebAssembly: true,
     topLevelAwait: true,
+  },
+};
+```
+
+### experiments.backCompat $#experimentsbackcompat$
+
+为许多 webpack 4 api 启用后向兼容层，并发出弃用警告。
+
+- 类型：`boolean`
+
+```js
+module.exports = {
+  //...
+  experiments: {
+    backCompat: true,
   },
 };
 ```
@@ -55,12 +72,14 @@ When enabled, webpack can build remote resources that begin with the `http(s):` 
 
 - Type:
 
-  One of the following:
+  - `(string | RegExp | ((uri: string) => boolean))[]`
 
-  - `boolean`
+    A shortcut for [`experiments.buildHttp.allowedUris`](#experimentsbuildhttpalloweduris).
+
   - `HttpUriOptions`
     ```ts
     {
+      allowedUris: (string|RegExp|(uri: string) => boolean)[],
       cacheLocation?: false | string,
       frozen?: boolean,
       lockfileLocation?: string,
@@ -86,6 +105,28 @@ When enabled, webpack can build remote resources that begin with the `http(s):` 
   import pMap1 from 'https://cdn.skypack.dev/p-map';
   // with `buildHttp` enabled, webpack will build pMap1 just like a regular local module
   console.log(pMap1);
+  ```
+
+#### experiments.buildHttp.allowedUris $#experimentsbuildhttpalloweduris$
+
+允许的 URI 列表。
+
+- 类型：`(string|RegExp|(uri: string) => boolean)[]`
+- 示例
+
+  ```javascript
+  // webpack.config.js
+  module.exports = {
+    //...
+    experiments: {
+      buildHttp: {
+        allowedUris: [
+          'http://localhost:9990/',
+          'https://raw.githubusercontent.com/',
+        ],
+      },
+    },
+  };
   ```
 
 #### experiments.buildHttp.cacheLocation $#experimentsbuildhttpcachelocation$
@@ -132,6 +173,12 @@ Detect changes to remote resources and upgrade them automatically.
 
 - Type: `boolean`
 
+### experiments.css $#experimentscss$
+
+启用原生 CSS 支持。请注意该实验特性仍处于开发状态并且将会在 webpack v6 中默认启用，你可以在 [GitHub](https://github.com/webpack/webpack/issues/14893) 中跟踪进度。
+
+- Type: `boolean`
+
 ### experiments.cacheUnaffected $#experimentscacheunaffected$
 
 Enable additional in-memory caching of modules which are unchanged and reference only unchanged modules.
@@ -149,7 +196,7 @@ Defaults to the value of [`futureDefaults`](#experimentsfuturedefaults).
 ```js
 module.exports = {
   //...
-  experimental: {
+  experiments: {
     futureDefaults: true,
   },
 };
@@ -160,31 +207,51 @@ module.exports = {
 Compile entrypoints and dynamic `import`s only when they are in use. It can be used for either Web or Node.js.
 
 - Type
+
   - `boolean`
   - `object`
+
     ```ts
     {
-      // define a custom backend
-      backend?: ((
-        compiler: webpack.Compiler,
-        client: string,
-        callback: (err?: Error, api?: any) => void
+    // define a custom backend
+    backend?: ((
+      compiler: Compiler,
+      callback: (err?: Error, api?: BackendApi) => void
       ) => void)
-      | ((
-          compiler: webpack.Compiler,
-          client: string
-        ) => Promise<any>)
-      client?: string,
-      entries?: boolean,
-      imports?: boolean,
-      test?: RegExp | string | ((module: import("../lib/Module")) => boolean)
+      | ((compiler: Compiler) => Promise<BackendApi>)
+      | {
+        /**
+         * A custom client.
+        */
+        client?: string;
+
+        /**
+         * Specify where to listen to from the server.
+         */
+        listen?: number | ListenOptions | ((server: typeof Server) => void);
+
+        /**
+         * Specify the protocol the client should use to connect to the server.
+         */
+        protocol?: "http" | "https";
+
+        /**
+         * Specify how to create the server handling the EventSource requests.
+         */
+        server?: ServerOptionsImport | ServerOptionsHttps | (() => typeof Server);
+
+    },
+    entries?: boolean,
+    imports?: boolean,
+    test?: string | RegExp | ((module: Module) => boolean)
     }
     ```
-    - `client`: Path to a custom client, defaults to `webpack/hot/lazy-compilation-{node|web}.js`.
-    - `backend`: Customize the backend, defaults to `webpack/lib/hmr/lazyCompilationBackend`.
+
+    - `backend`: Customize the backend.
     - `entries`: Enable lazy compilation for entries.
     - `imports` <Badge text='5.20.0+' />: Enable lazy compilation for dynamic imports.
     - `test` <Badge text='5.20.0+' />: Specify which imported modules should be lazily compiled.
+
 - Available: 5.17.0+
 - Example 1:
   ```js

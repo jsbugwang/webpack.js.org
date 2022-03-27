@@ -8,6 +8,7 @@ contributors:
   - anikethsaha
   - jamesgeorge007
   - chenxsan
+  - dev-itsheng
 translators:
   - jsbugwang
 ---
@@ -144,7 +145,7 @@ T> loader 可以被链式调用意味着不一定要输出 JavaScript。只要�
 **loader.js**
 
 ```js
-import { getOptions } from 'loader-utils';
+import { urlToRequest } from 'loader-utils';
 import { validate } from 'schema-utils';
 
 const schema = {
@@ -157,12 +158,14 @@ const schema = {
 };
 
 export default function (source) {
-  const options = getOptions(this);
+  const options = this.getOptions();
 
   validate(schema, options, {
     name: 'Example Loader',
     baseDataPath: 'options',
   });
+  
+  console.log('The request path', urlToRequest(this.resourcePath));
 
   // 对资源应用一些转换……
 
@@ -286,10 +289,8 @@ module.exports = {
 **src/loader.js**
 
 ```js
-import { getOptions } from 'loader-utils';
-
 export default function loader(source) {
-  const options = getOptions(this);
+  const options = this.getOptions();
 
   source = source.replace(/\[name\]/g, options.name);
 
