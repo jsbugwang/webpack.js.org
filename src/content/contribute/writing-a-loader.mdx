@@ -19,7 +19,7 @@ loader 是导出为一个函数的 node 模块。该函数在 loader 转换资�
 
 在深入研究不同 loader 以及他们的用法和例子之前，我们先看三种本地开发测试的方法。
 
-匹配(test)单个 loader，你可以通过在 rule 对象使用 `path.resolve` 指定一个本地文件：
+匹配（test）单个 loader，你可以通过在 rule 对象使用 `path.resolve` 指定一个本地文件：
 
 **webpack.config.js**
 
@@ -46,7 +46,7 @@ module.exports = {
 };
 ```
 
-匹配(test)多个 loaders，你可以使用 `resolveLoader.modules` 配置，webpack 将会从这些目录中搜索这些 loaders。例如，如果你的项目中有一个 `/loaders` 本地目录：
+匹配（test）多个 loaders，你可以使用 `resolveLoader.modules` 配置，webpack 将会从这些目录中搜索这些 loaders。例如，如果你的项目中有一个 `/loaders` 本地目录：
 
 **webpack.config.js**
 
@@ -69,7 +69,7 @@ T> 你可以用 [`webpack-defaults` package](https://github.com/webpack-contrib/
 
 当一个 loader 在资源中使用，这个 loader 只能传入一个参数 - 一个包含资源文件内容的字符串。
 
-同步 loader 可以 `return` 一个代表已转换模块(transformed module)的单一值。在更复杂的情况下，loader 也可以通过使用 `this.callback(err, values...)` 函数，返回任意数量的值。错误要么传递给这个 `this.callback` 函数，要么抛给(thrown in)同步 loader 。
+同步 loader 可以 `return` 一个代表已转换模块（transformed module）的单一值。在更复杂的情况下，loader 也可以通过使用 `this.callback(err, values...)` 函数，返回任意数量的值。错误要么传递给这个 `this.callback` 函数，要么抛给（thrown in）同步 loader 。
 
 loader 会返回一个或者两个值。第一个值的类型是 JavaScript 代码的字符串或者 buffer。第二个可选值是 SourceMap，它是个 JavaScript 对象。
 
@@ -77,7 +77,7 @@ loader 会返回一个或者两个值。第一个值的类型是 JavaScript 代�
 
 当链式调用多个 loader 的时候，请记住它们是反方向执行的。取决于数组写法格式，从右向左或者从下向上执行。
 
-- 最后的 loader 最早调用，将会传入原始资源(raw resource)内容。
+- 最后的 loader 最早调用，将会传入原始资源（raw resource）内容。
 - 第一个 loader 最后调用，期望值是传出 JavaScript 和 source map（可选）。
 - 中间的 loader 执行时，会传入前一个 loader 的结果。
 
@@ -103,15 +103,15 @@ module.exports = {
 
 编写 loader 时应该遵循以下准则。它们按重要程度排序，有些仅适用于某些场景，请阅读下面详细的章节以获得更多信息。
 
-- 保持**简单**。
-- 使用**链式**传递。
-- **模块化**的输出。
-- 确保**无状态**。
-- 使用 **loader utilities**。
-- 记录 **loader 的依赖**。
-- 解析**模块依赖关系**。
-- 提取**通用代码**。
-- 避免**绝对路径**。
+- 保持  **简单** 。
+- 使用 **链式** 传递。
+- **模块化** 的输出。
+- 确保 **无状态** 。
+- 使用 **loader utilities** 。
+- 记录 **loader 的依赖** 。
+- 解析 **模块依赖关系** 。
+- 提取 **通用代码** 。
+- 避免 **绝对路径** 。
 - 使用 **peer dependencies**。
 
 ### 简单(simple) $#simple$
@@ -124,7 +124,7 @@ loaders 应该只做单一任务。这不仅使每个 loader 易维护，也可�
 
 以通过 loader 选项或者查询参数得到的数据渲染模板为例。可以把源代码编译为模板，执行并输出包含 HTML 代码的字符串写到一个 loader 中。但是根据用法准则，已经存在这样一个 `apply-loader`，可以将它和其他开源 loader 串联在一起调用。
 
-- `jade-loader`: 导出一个函数，把模板转换为模块。
+- `pug-loader`: 导出一个函数，把模板转换为模块。
 - `apply-loader`: 根据 loader 选项执行函数，返回原生 HTML。
 - `html-loader`: 接收 HTML，输出一个合法的 JS 模块。
 
