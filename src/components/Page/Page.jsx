@@ -50,16 +50,38 @@ export default function Page(props) {
   const { hash, pathname } = useLocation();
 
   useEffect(() => {
+    let observer;
     if (contentLoaded) {
       if (hash) {
-        const element = document.querySelector(hash);
-        if (element) {
-          element.scrollIntoView();
+        const target = document.querySelector('#md-content');
+        // two cases here
+        // 1. server side rendered page, so hash target is already there
+        if (document.querySelector(hash)) {
+          document.querySelector(hash).scrollIntoView();
+        } else {
+          // 2. dynamic loaded content
+          // we need to observe the dom change to tell if hash exists
+          observer = new MutationObserver(() => {
+            const element = document.querySelector(hash);
+            if (element) {
+              element.scrollIntoView();
+            }
+          });
+          observer.observe(target, {
+            childList: true,
+            attributes: false,
+            subtree: false,
+          });
         }
       } else {
         window.scrollTo(0, 0);
       }
     }
+    return () => {
+      if (observer) {
+        observer.disconnect();
+      }
+    };
   }, [contentLoaded, pathname, hash]);
 
   const numberOfContributors = contributors.length;
@@ -97,7 +119,16 @@ export default function Page(props) {
       <Markdown>
         <h1>{title}</h1>
 
-        {contentRender}
+        {rest.thirdParty ? (
+          <div className="italic my-[20px]">
+            <strong className="font-bold">Disclaimer:</strong> {title} is a
+            third-party package maintained by community members, it potentially
+            does not have the same support, security policy or license as
+            webpack, and it is not maintained by webpack.
+          </div>
+        ) : null}
+
+        <div id="md-content">{contentRender}</div>
 
         {loadRelated && (
           <div className="print:hidden">
@@ -120,7 +151,10 @@ export default function Page(props) {
 
         {loadTranslators && (
           <div className="contributors__section">
-            <h3>译者</h3>
+            <h3 className="!font-sans !font-normal">
+              {translators.length}{' '}
+              位译者
+            </h3>
             <Translators translators={translators} />
           </div>
         )}

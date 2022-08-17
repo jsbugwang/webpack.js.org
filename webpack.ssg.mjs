@@ -2,7 +2,7 @@
 import WebpackPwaManifest from 'webpack-pwa-manifest';
 import path from 'path';
 import { merge } from 'webpack-merge';
-import OptimizeCSSAssetsPlugin from 'css-minimizer-webpack-plugin';
+import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import SSGPlugin from 'static-site-generator-webpack-plugin';
 import RedirectWebpackPlugin from 'redirect-webpack-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
@@ -24,11 +24,6 @@ export default (env) =>
     name: 'ssg',
     mode: 'production',
     target: 'node',
-    cache: {
-      buildDependencies: {
-        config: [__filename],
-      },
-    },
     module: {
       parser: {
         javascript: {
@@ -44,7 +39,11 @@ export default (env) =>
       libraryTarget: 'umd',
     },
     optimization: {
-      minimizer: [new OptimizeCSSAssetsPlugin({})],
+      minimizer: [
+        new CssMinimizerPlugin({
+          minify: CssMinimizerPlugin.parcelCssMinify,
+        }),
+      ],
     },
     plugins: [
       new SSGPlugin({
