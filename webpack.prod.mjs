@@ -1,6 +1,6 @@
 // Import External Dependencies
 import { merge } from 'webpack-merge';
-import OptimizeCSSAssetsPlugin from 'css-minimizer-webpack-plugin';
+import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import { InjectManifest } from 'workbox-webpack-plugin';
 import path from 'path';
 
@@ -15,11 +15,6 @@ import ProdAssetsManifest from './src/ProdAssetsManifest.mjs';
 export default (env) =>
   merge(common(env), {
     mode: 'production',
-    cache: {
-      buildDependencies: {
-        config: [__filename],
-      },
-    },
     entry: {
       index: {
         import: './index.jsx',
@@ -40,7 +35,12 @@ export default (env) =>
           },
         },
       },
-      minimizer: ['...', new OptimizeCSSAssetsPlugin({})],
+      minimizer: [
+        '...',
+        new CssMinimizerPlugin({
+          minify: CssMinimizerPlugin.lightningCssMinify,
+        }),
+      ],
     },
     plugins: [
       new InjectManifest({

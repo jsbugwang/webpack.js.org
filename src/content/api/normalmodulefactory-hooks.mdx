@@ -10,7 +10,7 @@ translators:
 
 `Compiler` 使用 `NormalModuleFactory` 模块生成各类模块。从入口点开始，此模块会分解每个请求，解析文件内容以查找进一步的请求，然后通过分解所有请求以及解析新的文件来爬取全部文件。在最后阶段，每个依赖项都会成为一个模块实例。
 
-`NormalModuleFactory` 类扩展了 `Tapable` 并提供了以下的生命周期钩子。 
+`NormalModuleFactory` 类扩展了 `Tapable` 并提供了以下的生命周期钩子。
 你可以像使用编译器钩子一样使用它们：
 
 ```js
@@ -32,7 +32,7 @@ NormalModuleFactory.hooks.someHook.for('identifier').tap(/* ... */);
 
 当遇到新的依赖项请求时调用。可以通过返回 `false` 来忽略依赖项。否则，返回 `undefined` 以继续。
 
-- 回调参数：`ResolveData`
+- 回调参数：`resolveData`
 
 ### factorize $#factorize$
 
@@ -50,7 +50,7 @@ NormalModuleFactory.hooks.someHook.for('identifier').tap(/* ... */);
 
 - 回调参数：`resolveData`
 
-### resolveForScheme $#resolveForScheme$
+### resolveForScheme $#resolveforscheme$
 
 `AsyncSeriesBailHook`
 
@@ -58,7 +58,7 @@ NormalModuleFactory.hooks.someHook.for('identifier').tap(/* ... */);
 
 - 回调参数：`resolveData`
 
-### afterResolve $#afterResolve$
+### afterResolve $#afterresolve$
 
 `AsyncSeriesBailHook`
 
@@ -66,7 +66,7 @@ NormalModuleFactory.hooks.someHook.for('identifier').tap(/* ... */);
 
 - 回调参数：`resolveData`
 
-### createModule $#createModule$
+### createModule $#createmodule$
 
 `AsyncSeriesBailHook`
 
@@ -82,11 +82,11 @@ NormalModuleFactory.hooks.someHook.for('identifier').tap(/* ... */);
 
 - 回调参数：`module` `createData` `resolveData`
 
-### createParser $#createParser$
+### createParser $#createparser$
 
 `HookMap<SyncBailHook>`
 
-在 `Parser` 实例创建后调用。`parserOptions` 是 [module.parser](/configuration/module/#moduleparser) 中对应标识符或空对象的选项。
+在 `Parser` 实例创建之前调用。`parserOptions` 是 [module.parser](/configuration/module/#moduleparser) 中对应标识符或空对象的选项。
 
 - 钩子参数：`identifier`
 
@@ -112,11 +112,11 @@ NormalModuleFactory.hooks.someHook.for('identifier').tap(/* ... */);
 6. `webassembly/async`
 7. `asset`
 
-### createGenerator $#createGenerator$
+### createGenerator $#creategenerator$
 
 `HookMap<SyncBailHook>`
 
-在 `Generator` 实例创建后调用。`generatorOptions` 是 [module.parser](/configuration/module/#modulegenerator) 中对应标识符或空对象的选项。
+在 `Generator` 实例创建之前调用。`generatorOptions` 是 [module.parser](/configuration/module/#modulegenerator) 中对应标识符或空对象的选项。
 
 - 钩子参数：`identifier`
 

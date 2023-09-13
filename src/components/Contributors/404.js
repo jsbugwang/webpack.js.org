@@ -7,4 +7,6 @@ export const contributorsNotFound = [
   'MijaelWatts',
   'Kolhar730',
   'grrizzly',
+  'maxloh',
+  'varunjayaraman',
 ];

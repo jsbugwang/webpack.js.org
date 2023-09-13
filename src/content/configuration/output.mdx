@@ -27,6 +27,7 @@ contributors:
   - QC-L
   - anshumanv
   - mrzalyaul
+  - JakobJingleheimer
 translators:
   - dear-lizhihua
   - jacob-lcs
@@ -35,11 +36,31 @@ translators:
 
 `output` 位于对象最顶级键(key)，包括了一组选项，指示 webpack 如何去输出、以及在哪里输出你的「bundle、asset 和其他你所打包或使用 webpack 载入的任何内容」。
 
-## output.assetModuleFilename $#outputassetModulefilename$
+## output.assetModuleFilename $#outputassetmodulefilename$
 
 `string = '[hash][ext][query]'`
 
 与 [`output.filename`](#outputfilename) 相同，不过应用于 [Asset Modules](/guides/asset-modules/)。
+
+对从数据 URI 替换构建的静态资源，`[name]`, `[file]`, `[query]`, `[fragment]`, `[base]` 与 `[path]` 为空字符串。
+
+## output.asyncChunks
+
+`boolean = true`
+
+创建按需加载的异步 chunk。
+
+**webpack.config.js**
+
+```javascript
+module.exports = {
+  //...
+  output: {
+    //...
+    asyncChunks: true,
+  },
+};
+```
 
 ## output.auxiliaryComment $#outputauxiliarycomment$
 
@@ -155,6 +176,8 @@ module.exports = {
 
 chunk 的格式（formats 默认包含 `'array-push'` (web/WebWorker)、`'commonjs'` (node.js)、`'module'` (ESM)，还有其他情况可由插件添加）。
 
+T> The default value of this option depends on the [`target`](/configuration/target/) and [`output.module`](#outputmodule) setting. For more details, search for `"chunkFormat"` [in the webpack defaults](https://github.com/webpack/webpack/blob/main/lib/config/defaults.js).
+
 **webpack.config.js**
 
 ```javascript
@@ -208,6 +231,8 @@ module.exports = {
 `false` `string: 'jsonp' | 'import-scripts' | 'require' | 'async-node' | 'import' | <any string>`
 
 加载 chunk 的方法（默认值有 `'jsonp'` (web)、`'import'` (ESM)、`'importScripts'` (WebWorker)、`'require'` (sync node.js)、`'async-node'` (async node.js)，还有其他值可由插件添加)。
+
+T> The default value of this option depends on the [`target`](/configuration/target/) and [`chunkFormat `](#outputchunkformat) setting. For more details, search for `"chunkLoading"` [in the webpack defaults](https://github.com/webpack/webpack/blob/main/lib/config/defaults.js).
 
 **webpack.config.js**
 
@@ -336,7 +361,7 @@ module.exports = {
 };
 ```
 
-模板字符串(template string)中做以下替换（通过 webpack 内部的 [`ModuleFilenameHelpers`](https://github.com/webpack/webpack/blob/master/lib/ModuleFilenameHelpers.js)）：
+模板字符串(template string)中做以下替换（通过 webpack 内部的 [`ModuleFilenameHelpers`](https://github.com/webpack/webpack/blob/main/lib/ModuleFilenameHelpers.js)）：
 
 | Template                 | Description                                                                |
 | ------------------------ | -------------------------------------------------------------------------- |
@@ -368,7 +393,7 @@ module.exports = {
 
 `string`
 
-此选项确定 [`output.devtoolModuleFilenameTemplate`](#outputdevtoolmodulefilenametemplate) 使用的模块名称空间。未指定时的默认值为：[`output.library`](#outputlibrary)。在加载多个通过 webpack 构建的 library 时，用于防止 source map 中源文件路径冲突。
+此选项确定 [`output.devtoolModuleFilenameTemplate`](#outputdevtoolmodulefilenametemplate) 使用的模块名称空间。未指定时的默认值为：[`output.uniqueName`](#outputuniquename)。在加载多个通过 webpack 构建的 library 时，用于防止 source map 中源文件路径冲突。
 
 例如，如果你有两个 library，分别使用命名空间 `library1` 和 `library2`，并且都有一个文件 `./src/index.js`（可能具有不同内容），它们会将这些文件暴露为 `webpack://library1/./src/index.js` 和 `webpack://library2/./src/index.js`。
 
@@ -441,6 +466,10 @@ module.exports = {
       forOf: true,
       // The environment supports ECMAScript Module syntax to import ECMAScript modules (import ... from '...').
       module: false,
+      // The environment supports optional chaining ('obj?.a' or 'obj?.()').
+      optionalChaining: true,
+      // The environment supports template literals.
+      templateLiteral: true,
     },
   },
 };
@@ -542,7 +571,7 @@ module.exports = {
 
 ### Template strings $#template-strings$
 
-可以使用以下替换模板字符串（通过 webpack 内部的[`TemplatedPathPlugin`](https://github.com/webpack/webpack/blob/master/lib/TemplatedPathPlugin.js)）:
+可以使用以下替换模板字符串（通过 webpack 内部的[`TemplatedPathPlugin`](https://github.com/webpack/webpack/blob/main/lib/TemplatedPathPlugin.js)）:
 
 可在编译层面进行替换的内容：
 
@@ -632,28 +661,13 @@ type ModulePathData = {
 
 T> 在某些上下文中，属性将使用 JavaScript 代码表达式代替原始值。在此情况下，`WithLength` 变量是可用的，应该使用它来代替对原始值的分片操作。
 
-## output.futureEmitAssets $#outputfutureemitassets$
-
-`boolean = false`
-
-告诉 webpack 使用未来版本的资源文件 emit 逻辑，允许在 emit 后释放资源文件的内存。这可能会破坏那些认为资源文件 emit 后仍然可读的插件。
-
-W> 在 webpack v5.0.0 中 `output.futureEmitAssets` 选项被移除并且这种行为将被默认支持。
-
-```javascript
-module.exports = {
-  //...
-  output: {
-    futureEmitAssets: true,
-  },
-};
-```
-
 ## output.globalObject $#outputglobalobject$
 
-`string = 'window'`
+`string = 'self'`
 
 当输出为 library 时，尤其是当 `libraryTarget` 为 `'umd'`时，此选项将决定使用哪个全局对象来挂载 library。为了使 UMD 构建在浏览器和 Node.js 上均可用，应将 `output.globalObject` 选项设置为 `'this'`。对于类似 web 的目标，默认为 `self`。
+
+入口点的返回值将会使用 `output.library.name` 赋值给全局对象。依赖于 `target` 配置项，全局对象将会发生对应的改变，例如：`self`, `global` 或者 `globalThis`。
 
 示例：
 
@@ -675,13 +689,15 @@ module.exports = {
 
 `string = 'hex'`
 
-在生成 hash 时使用的编码方式。支持 Node.js [`hash.digest`](https://nodejs.org/api/crypto.html#crypto_hash_digest_encoding) 的所有编码。对文件名使用 `'base64'`，可能会出现问题，因为 base64 字母表中具有 `/` 这个字符(character)。同样的，`'latin1'` 规定可以含有任何字符(character)。
+在生成 hash 时使用的编码方式。支持 Node.js [`hash.digest`](https://nodejs.org/api/buffer.html#buffers-and-character-encodings) 的所有编码。对文件名使用 `'base64'`，可能会出现问题，因为 base64 字母表中具有 `/` 这个字符(character)。同样的，`'latin1'` 规定可以含有任何字符(character)。
 
 ## output.hashDigestLength $#outputhashdigestlength$
 
 `number = 20`
 
 散列摘要的前缀长度。
+
+T> 针对 `webpack v5.65.0+`，在 [`experiments.futureDefaults`](/configuration/experiments/#experimentsfuturedefaults) 启用时，`hashDigestLength` 配置项会以 `16` 作为默认值。
 
 ## output.hashFunction $#outputhashfunction$
 
@@ -855,7 +871,7 @@ export function hello(name) {
    </script>
    ```
 
-   查看 [示例](https://github.com/webpack/webpack/tree/master/examples/multi-part-library) 获取更多内容。
+   查看 [示例](https://github.com/webpack/webpack/tree/main/examples/multi-part-library) 获取更多内容。
 
    请注意，如果你打算在每个入口点配置 library 配置项的话，以上配置将不能按照预期执行。这里是如何 [在每个入口点下](/concepts/entry-points/#entrydescription-object) 做的方法：
 
@@ -899,6 +915,7 @@ module.exports = {
 指定库的名称。
 
 - 类型：
+
   ```ts
   string | string[] | {amd?: string, commonjs?: string, root?: string | string[]}
   ```
@@ -909,9 +926,9 @@ module.exports = {
 
 - 类型：`string`
 
-  类型默认包括 `'var'`、`'module'`、`'assign'`、`'assign-properties'`、`'this'`、`'window'`、`'self'`、`'global'`、`'commonjs'`、`'commonjs2'`、`'commonjs-module'`、`'amd'`、`'amd-require'`、`'umd'`、`'umd2'`、`'jsonp'` 以及 `'system'`，除此之外也可以通过插件添加。
+  类型默认包括 `'var'`、 `'module'`、 `'assign'`、 `'assign-properties'`、 `'this'`、 `'window'`、 `'self'`、 `'global'`、 `'commonjs'`、 `'commonjs2'`、 `'commonjs-module'`、 `'commonjs-static'`、 `'amd'`、 `'amd-require'`、 `'umd'`、 `'umd2'`、 `'jsonp'` 以及 `'system'`，除此之外也可以通过插件添加。
 
-对于接下来的实例，我们将会使用 `__entry_return_` 表示被入口点返回的值。
+对于接下来的示例，我们将会使用 `_entry_return_` 表示被入口点返回的值。
 
 #### Expose a Variable $#exposeavariable$
 
@@ -962,7 +979,9 @@ MyLibrary = _entry_return_;
 
 请注意，如果 `MyLibrary` 没有在你的库之前定义，那么它将会被设置在全局作用域。
 
-##### type: 'assign-properties' <Badge text='5.16.0+' /> $#typeassignproperties$
+##### type: 'assign-properties' $#typeassignproperties$
+
+<Badge text="5.16.0+" />
 
 ```js
 module.exports = {
@@ -1140,6 +1159,54 @@ require('MyLibrary').doSomething();
 如果我们指定 `output.library.name` 为 `type: commmonjs2`，你的入口起点的返回值将会被赋值给 `module.exports.[output.library.name]`。
 
 T> 在考虑 CommonJS 与 CommonJS2 之间的区别？虽然它们很相似，但是它们之间有一些细微的差别，这些差别在 webpack 的上下文中通常是不相关的。（要获取更多详细内容，请 [阅读这个 issue](https://github.com/webpack/webpack/issues/1114)。）
+
+##### type: 'commonjs-static' $#type-commonjsstatic$
+
+<Badge text="5.66.0+" />
+
+```js
+module.exports = {
+  // …
+  output: {
+    library: {
+      // note there's no `name` here
+      type: 'commonjs-static',
+    },
+  },
+};
+```
+
+单个导出将被设置为 `module.exports` 中的属性。名称中的 "static" 是指输出是静态可分析的，因此具名导出可以通过 Node.js 导入到 ESM 中：
+
+输入：
+
+```javascript
+export function doSomething() {}
+```
+
+输出：
+
+```javascript
+function doSomething() {}
+
+// …
+
+exports.doSomething = __webpack_exports__.doSomething;
+```
+
+Consumption (CommonJS):
+
+```javascript
+const { doSomething } = require('./output.cjs'); // doSomething => [Function: doSomething]
+```
+
+Consumption (ESM):
+
+```javascript
+import { doSomething } from './output.cjs'; // doSomething => [Function: doSomething]
+```
+
+T> 当源代码是用 ESM 编写的，并且输出应该兼容 CJS 和 ESM 时，这是很有用的。获取更多详情，请阅读该 [issue](https://github.com/webpack/webpack/issues/14998) 或者 [这篇文档](https://dev.to/jakobjingleheimer/configuring-commonjs-es-modules-for-nodejs-12ed)（尤其是 [这个章节](https://dev.to/jakobjingleheimer/configuring-commonjs-es-modules-for-nodejs-12ed#publish-only-a-cjs-distribution-with-property-exports)）。
 
 ##### type: 'amd' $#type-amd$
 
@@ -1438,7 +1505,7 @@ module.exports = {
   //Test Comment
   else root['MyLibrary'] = factory();
 })(self, function () {
-  return __entry_return_;
+  return _entry_return_;
 });
 ```
 
@@ -1564,7 +1631,9 @@ MyLibrary = _entry_return_;
 
 注意，如果 `MyLibrary` 在作用域中未在前面代码进行定义，则你的 library 将被设置在全局作用域内。
 
-#### libraryTarget: 'assign-properties' <Badge text='5.16.0+' /> $#libraryTarget-assign-properties$
+#### libraryTarget: 'assign-properties' $#libraryTarget-assign-properties$
+
+<Badge text="5.16.0+" />
 
 W> 最好使用 [output.library.type: 'assign-properties'`](#type-assign-properties)。
 
@@ -1904,7 +1973,7 @@ module.exports = {
 };
 ```
 
-W> `output.module` 是一个实验性的功能， 想要使用的话，通过设置 [`experiments.outputModule`](/configuration/experiments/#experiments) 为 `true`。
+W> `output.module` 是一个实验性的功能，想要使用的话只能通过设置 [`experiments.outputModule`](/configuration/experiments/#experiments) 为 `true`。目前存在[一个已知问题](https://github.com/webpack/webpack/issues/11277#issuecomment-992565287) 是这样的库不能被基于 webpack4（也可能是其他构建工具）的应用程序使用。
 
 ## output.path $#outputpath$
 
@@ -1961,7 +2030,7 @@ T> 这些注释也会被添加至经过 tree shaking 后生成的 bundle 中。
 
 此选项指定在浏览器中所引用的「此输出目录对应的**公开 URL**」。相对 URL(relative URL) 会被相对于 HTML 页面（或 `<base>` 标签）解析。相对于服务的 URL(Server-relative URL)，相对于协议的 URL(protocol-relative URL) 或绝对 URL(absolute URL) 也可是可能用到的，或者有时必须用到，例如：当将资源托管到 CDN 时。
 
-该选项的值是以 runtime(运行时) 或 loader(载入时) 所创建的每个 URL 为前缀。因此，在多数情况下，**此选项的值都会以 `/` 结束**。
+该选项的值是以 runtime(运行时) 或 loader(载入时) 所创建的每个 URL 的前缀。因此，在多数情况下，**此选项的值都会以 `/` 结束**。
 
 规则如下：[`output.path`](#outputpath) 中的 URL 以 HTML 页面为基准。
 
@@ -2228,7 +2297,7 @@ module.exports = {
 
 新选项 `workerChunkLoading` 用于控制 workder 的 chunk 加载。
 
-T> 此选项默认值取决于 `target` 的设置。欲了解更多详情，请在 [webpack 默认值文件中搜索](https://github.com/webpack/webpack/blob/master/lib/config/defaults.js) `"workerChunkLoading"`。
+T> 此选项默认值取决于 `target` 的设置。欲了解更多详情，请在 [webpack 默认值文件中搜索](https://github.com/webpack/webpack/blob/main/lib/config/defaults.js) `"workerChunkLoading"`。
 
 **webpack.config.js**
 

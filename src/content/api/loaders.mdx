@@ -213,7 +213,15 @@ addDependency(file: string)
 dependency(file: string) // shortcut
 ```
 
-加入一个文件作为产生 loader 结果的依赖，使它们的任何变化可以被监听到。例如，[`sass-loader`](https://github.com/webpack-contrib/sass-loader), [`less-loader`](https://github.com/webpack-contrib/less-loader) 就使用了这个技巧，当它发现无论何时导入的 `css` 文件发生变化时就会重新编译。
+添加一个文件作为产生 loader 结果的依赖，使它们的任何变化可以被监听到。例如，[`sass-loader`](https://github.com/webpack-contrib/sass-loader), [`less-loader`](https://github.com/webpack-contrib/less-loader) 就使用了这个技巧，当它发现无论何时导入的 `css` 文件发生变化时就会重新编译。
+
+### this.addMissingDependency $#thisaddmissingdependency$
+
+```typescript
+addMissingDependency(file: string)
+```
+
+添加一个不存在的文件作为 loader 结果的依赖项，以使它们可监听。类似于 `addDependency`，但是会在正确附加观察者之前处理在编译期间文件的创建。
 
 ### this.async $#thisasync$
 
@@ -640,7 +648,7 @@ module.exports = function (source) {
 
 这个模块将获取像下面的 bundle：
 
-```
+```text
 /***/ "./src/loader.js!./src/lib.js":
 /*!************************************!*\
   !*** ./src/loader.js!./src/lib.js ***!
@@ -711,16 +719,16 @@ console.log('yep');
 **extract-style-loader/index.js**
 
 ```javascript
-const stringifyRequest = require('loader-utils').stringifyRequest;
-const getRemainingRequest = require('loader-utils').getRemainingRequest;
-const getStylesLoader = require.resolve('./getStyle');
+const getStylesLoader = require.resolve('./getStyles');
 
 module.exports = function (source) {
   if (STYLES_REGEXP.test(source)) {
     source = source.replace(STYLES_REGEXP, '');
-    const remReq = getRemainingRequest(this);
-    return `import ${stringifyRequest(
-      `${this.resource}.css!=!${getStylesLoader}!${remReq}`
+    return `import ${JSON.stringify(
+      this.utils.contextify(
+        this.context || this.rootContext,
+        `${this.resource}.css!=!${getStylesLoader}!${this.remainingRequest}`
+      )
     )};${source}`;
   }
   return source;
@@ -731,7 +739,7 @@ module.exports = function (source) {
 
 ```javascript
 module.exports = function (source) {
-  const match = STYLES_REGEXP.match(source);
+  const match = source.match(STYLES_REGEXP);
   return match[0];
 };
 ```

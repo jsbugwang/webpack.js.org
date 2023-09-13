@@ -18,6 +18,7 @@ contributors:
   - rohrlaf
   - jamesgeorge007
   - anshumanv
+  - snitin315
 translators:
   - weiyuan0609
   - jacob-lcs
@@ -104,6 +105,8 @@ W> 从 webpack 5 开始，不再允许将 entry 名称传递给 `{cacheGroup}.te
 
 这表明将选择哪些 chunk 进行优化。当提供一个字符串，有效值为 `all`，`async` 和 `initial`。设置为 `all` 可能特别强大，因为这意味着 chunk 可以在异步和非异步 chunk 之间共享。
 
+Note that it is applied to the fallback cache group as well (`splitChunks.fallbackCacheGroup.chunks`).
+
 **webpack.config.js**
 
 ```js
@@ -168,9 +171,17 @@ Sets the size types which are used when a number is used for sizes.
 
 ### splitChunks.minSize $#splitchunksminsize$
 
-`number = 20000`
+`number = 20000` `{ [index: string]: number }`
 
 生成 chunk 的最小体积（以 bytes 为单位）。
+
+### splitChunks.minSizeReduction $#splitchunksminsizereduction$
+
+`number` `{ [index: string]: number }`
+
+生成 chunk 所需的主 chunk（bundle）的最小体积（以字节为单位）缩减。这意味着如果分割成一个 chunk 并没有减少主 chunk（bundle）的给定字节数，它将不会被分割，即使它满足 `splitChunks.minSize`。
+
+T> 为了生成 chunk，`splitChunks.minSizeReduction` 与 `splitChunks.minSize` 都需要被满足。
 
 ### splitChunks.enforceSizeThreshold $#splitchunksenforcesizethreshold$
 
@@ -242,6 +253,8 @@ T> 设置 `maxSize` 的值会同时设置 `maxAsyncSize` 和 `maxInitialSize` �
 如果你选择指定一个函数，则可能会发现 `chunk.name` 和 `chunk.hash` 属性（其中 `chunk` 是 `chunks` 数组的一个元素）在选择 chunk 名时特别有用。
 
 如果 `splitChunks.name` 与 [entry point](/configuration/entry-context/#entry) 名称匹配，entry point 将被删除。
+
+T> `splitChunks.cacheGroups.{cacheGroup}.name` can be used to move modules into a chunk that is a parent of the source chunk. For example, use `name: "entry-name"` to move modules into the `entry-name` chunk. You can also use on demand named chunks, but you must be careful that the selected modules are only used under this chunk.
 
 **main.js**
 

@@ -1,6 +1,5 @@
 module.exports = {
-  mode: 'jit',
-  purge: ['./src/components/**/*.{js,jsx}'],
+  content: ['./src/components/**/*.{js,jsx}'],
   darkMode: 'class', // or 'media' or 'class'
   theme: {
     screens: {
@@ -44,8 +43,7 @@ module.exports = {
       },
     },
   },
-  variants: {
-    extend: {},
+  corePlugins: {
+    preflight: false,
   },
-  plugins: [],
 };

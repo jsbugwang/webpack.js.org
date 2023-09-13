@@ -365,7 +365,7 @@ export function test() {
 
 当设置`"sideEffects": false`时，可以省略更多的模块。在这个例子中，当 `test` 导出未被使用时，`./something` 将被省略。
 
-要获得未使用的导出信息，需要使用 `optimization.unusedExports`。要删除无副作用的模块，需要使用`optimization.sideEffects`。
+要获得未使用的导出信息，需要使用 `optimization.usedExports`。要删除无副作用的模块，需要使用`optimization.sideEffects`。
 
 可以分析以下标记。
 
@@ -662,6 +662,7 @@ Webpack 过去总是在第一次构建时发出所有的输出文件，但在增
 - 添加了 `snapshot.immutablePaths`
 - 添加了 `resolve.cache`：此选项可禁用/启用 safe 解析缓存
 - 移除了 `resolve.concord`
+- 移除了 `resolve.moduleExtensions`
 - `resolve.alias` 值可以为数组或 `false`
 - 添加了 `resolve.restrictions`：允许限制可能存在的结果
 - 添加了 `resolve.fallback`：允许为处理不了的别名请求设置降级

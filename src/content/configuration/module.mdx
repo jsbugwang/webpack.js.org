@@ -20,6 +20,8 @@ contributors:
   - Mistyyyy
   - anshumanv
   - chenxsan
+  - snitin315
+  - vabushkevich
 translators:
   - jacob-lcs
   - QC-L
@@ -44,6 +46,9 @@ module.exports = {
 
         // 自定义 asset 模块的 publicPath，自 webpack 5.28.0 起可用
         publicPath: 'assets/',
+
+        // 将静态资源输出到相对于 'output.path' 的指定文件夹中，webpack 5.67.0 后可用
+        outputPath: 'cdn-assets/',
       },
       'asset/inline': {
         // asset/内联模块的 generator 选项
@@ -53,6 +58,9 @@ module.exports = {
 
         // 自定义 asset/resource 模块的 publicPath，自 webpack 5.28.0 起可用
         publicPath: 'assets/',
+
+        // 将静态资源输出到相对于 'output.path' 的指定文件夹中，webpack 5.67.0 后可用
+        outputPath: 'cdn-assets/',
       },
       javascript: {
         // 该模块类型尚不支持 generator 选项
@@ -142,6 +150,7 @@ module.exports = {
 - 类型：`boolean`
 - 可用版本：5.17.0+
 - 示例：
+
   ```js
   module.exports = {
     module: {
@@ -160,12 +169,173 @@ module.exports = {
 const x = require(/* webpackIgnore: true */ 'x');
 ```
 
+#### module.parser.javascript.dynamicImportMode
+
+指定动态导入的全局模式。
+
+- 类型：`'eager' | 'weak' | 'lazy' | 'lazy-once'`
+- 可用版本：5.73.0+
+- 示例：
+
+  ```js
+  module.exports = {
+    module: {
+      parser: {
+        javascript: {
+          dynamicImportMode: 'lazy',
+        },
+      },
+    },
+  };
+  ```
+
+#### module.parser.javascript.dynamicImportPrefetch
+
+指定动态导入的全局 prefetch。
+
+- 类型：` number | boolean`
+- 可用版本：5.73.0+
+- 示例：
+
+  ```js
+  module.exports = {
+    module: {
+      parser: {
+        javascript: {
+          dynamicImportPrefetch: false,
+        },
+      },
+    },
+  };
+  ```
+
+#### module.parser.javascript.dynamicImportPreload
+
+指定动态导入的全局 preload。
+
+- 类型：` number | boolean`
+- 可用版本：5.73.0+
+- 示例：
+
+  ```js
+  module.exports = {
+    module: {
+      parser: {
+        javascript: {
+          dynamicImportPreload: false,
+        },
+      },
+    },
+  };
+  ```
+
+#### module.parser.javascript.exportsPresence
+
+指出在 `\"import ... from ...\"` 与 `\"export ... from ...\"` 中无效导出名称的行为。
+
+- 类型：`'error' | 'warn' | 'auto' | false`
+- 可用版本：5.62.0+
+- 示例：
+
+  ```js
+  module.exports = {
+    module: {
+      parser: {
+        javascript: {
+          exportsPresence: 'error',
+        },
+      },
+    },
+  };
+  ```
+
+#### module.parser.javascript.importExportsPresence $#moduleparserjavascriptimportexportspresence$
+
+指出在 `\"import ... from ...\"` 中无效导出名称的行为。
+
+- 类型：`'error' | 'warn' | 'auto' | false`
+- 可用版本：5.62.0+
+- 示例：
+
+  ```js
+  module.exports = {
+    module: {
+      parser: {
+        javascript: {
+          importExportsPresence: 'error',
+        },
+      },
+    },
+  };
+  ```
+
+#### module.parser.javascript.importMeta
+
+Enable or disable evaluating `import.meta`.
+
+- 类型：`boolean = true`
+- 可用版本：5.68.0+
+- 示例：
+
+  ```js
+  module.exports = {
+    module: {
+      parser: {
+        javascript: {
+          importMeta: false,
+        },
+      },
+    },
+  };
+  ```
+
+#### module.parser.javascript.importMetaContext
+
+启用/禁用 [`import.meta.webpackContext`](/api/module-variables/#importmetawebpackcontext) 分析。
+
+- 类型：`boolean`
+- 可用版本：5.70.0+
+- 示例：
+
+  ```js
+  module.exports = {
+    module: {
+      parser: {
+        javascript: {
+          importMetaContext: true,
+        },
+      },
+    },
+  };
+  ```
+
+#### module.parser.javascript.reexportExportsPresence
+
+指出在  `\"export ... from ...\"` 中无效导出名称的行为。当在 TypeScript 重新导出类型，从 `\"export ... from ...\"` 迁移到 `\"export type ... from ...\"` 时禁用该配置项是有用的。
+
+- 类型：`'error' | 'warn' | 'auto' | false`
+- 可用版本：5.62.0+
+- 示例：
+
+  ```js
+  module.exports = {
+    module: {
+      parser: {
+        javascript: {
+          reexportExportsPresence: 'error',
+        },
+      },
+    },
+  };
+  ```
+
 #### module.parser.javascript.url $#moduleparserjavascripturl$
 
 启用 `new URL()` 语法解析。
 
 - 类型：`boolean = true` | `'relative'`
 - 示例:
+
   ```js
   module.exports = {
     module: {
@@ -180,12 +350,12 @@ const x = require(/* webpackIgnore: true */ 'x');
 
 自 webpack <Badge text='5.23.0' /> 起，`module.parser.javascript.url` 的 `'relative'` 值可用。当使用 `'relative'` 时，webpack 将为 `new URL()` 语法生成相对的 URL，即结果 URL 中不包含根 URL：
 
-```
+```html
 <!-- with 'relative' -->
-<img src='c43188443804f1b1f534.svg' />
+<img src="c43188443804f1b1f534.svg" />
 
 <!-- without 'relative' -->
-<img src='file:///path/to/project/dist/c43188443804f1b1f534.svg' />
+<img src="file:///path/to/project/dist/c43188443804f1b1f534.svg" />
 ```
 
 1. 当服务器不知道根 URL 时，这对 SSR（服务端渲染）很有用（而且可用节省一些字节）。为了使其相同，它也必须用于客户端构建。
@@ -377,7 +547,7 @@ module.exports = {
 
 `string`
 
-指定模块应放置在哪个 layer。
+指定模块应放置在哪个 layer。一组模块可以统一在一个 layer 中，然后可以被用在 [split chunks](/plugins/split-chunks-plugin/#splitchunkslayer)、[stats](/configuration/stats/#statsgroupmodulesbylayer) 或者 [entry options](/configuration/entry-context/#entry-descriptor)。
 
 **webpack.config.js**
 
@@ -439,7 +609,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\\.css$/,
+        test: /\.css$/,
         oneOf: [
           {
             resourceQuery: /inline/, // foo.css?inline
@@ -480,7 +650,7 @@ W> 由于需要支持 `Rule.options`，`UseEntry.options` 以及 `Rule.use`，�
 
 **示例**（默认的插件解析器选项）：
 
-```js-with-links
+```js
 module.exports = {
   //...
   module: {
@@ -498,7 +668,8 @@ module.exports = {
           browserify: false, // 禁用特殊处理的 browserify bundle
           requireJs: false, // 禁用 requirejs.*
           node: false, // 禁用 __dirname, __filename, module, require.extensions, require.main, 等。
-          node: {...}, // 在模块级别(module level)上重新配置 [node](/configuration/node) 层(layer)
+          commonjsMagicComments: false, // 禁用对 CommonJS 的  magic comments 支持
+          node: {}, // 在模块级别(module level)上重新配置 node 层(layer)
           worker: ["default from web-worker", "..."] // 自定义 WebWorker 对 JavaScript 的处理，其中 "..." 为默认值。
         }
       }
@@ -702,6 +873,34 @@ module.exports = {
 };
 ```
 
+### Rule.generator.outputPath $#rulegeneratoroutputpath$
+
+将静态资源输出到相对于 'output.path' 的指定文件夹中。只有当 'publicPath' 被用来匹配文件夹结构时才会需要设置该配置。
+
+- 类型：`string | ((pathData: PathData, assetInfo?: AssetInfo) => string)`
+- 可用：<Badge text='5.67.0+' />
+
+```js
+module.exports = {
+  //...
+  output: {
+    publicPath: 'static/',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.png$/i,
+        type: 'asset/resource',
+        generator: {
+          publicPath: 'https://cdn/assets/',
+          outputPath: 'cdn-assets/',
+        },
+      },
+    ],
+  },
+};
+```
+
 ## Rule.resource $#ruleresource$
 
 [`条件`](#条件)会匹配 resource。在 [`Rule` 条件](#rule-conditions) 中查阅详情。
@@ -718,7 +917,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\\.css$/,
+        test: /\.css$/,
         resourceQuery: /inline/,
         use: 'url-loader',
       },
@@ -812,7 +1011,7 @@ module.exports = {
     rules: [
       //...
       {
-        test: /\\.json$/,
+        test: /\.json$/,
         type: 'javascript/auto',
         loader: 'custom-json-loader',
       },
@@ -1033,7 +1232,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\\.css$/,
+        test: /\.css$/,
         include: [
           // will include any paths relative to the current directory starting with `app/styles`
           // e.g. `app/styles.css`, `app/styles/styles.css`, `app/stylesheet.css`
@@ -1152,7 +1351,7 @@ module.exports = {
     wrappedContextCritical: false,
     wrappedContextRecursive: true,
     wrappedContextRegExp: /.*/,
-    strictExportPresence: false, // since webpack 2.3.0
+    strictExportPresence: false,
   },
 };
 ```
@@ -1166,3 +1365,5 @@ T> 你可以使用 `ContextReplacementPlugin` 来修改这些单个依赖的值�
 - `require("./templates/" + expr)` 不应该包含默认子目录：`wrappedContextRecursive: false`
 - `strictExportPresence` 将缺失的导出提示成错误而不是警告
 - 为部分动态依赖项设置内部正则表达式：`wrappedContextRegExp: /\\.\\*/`
+
+W> 为支持 [`exportsPresence`](#moduleparserjavascriptexportspresence) 配置项，`strictExportPresence` 已被废弃。
