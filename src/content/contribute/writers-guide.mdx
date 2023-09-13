@@ -6,17 +6,18 @@ contributors:
   - EugeneHlushko
 translators:
   - jsbugwang
+  - Yucohny
 ---
 
-以下部分包含编辑(edit)和格式化(format)本网站内容的所有必需知识。请确保在开始编辑或添加之前，你已经进行过一些研究。有时候最困难的地方在于，确定内容应该在哪和确定它是否存在。
+以下部分包含编辑和格式化本网站内容的所有必需知识。请确保在开始编辑或添加之前，你已经进行过一些研究。有时候最困难的地方在于，确定内容应该在哪和确定它是否存在。
 
 ## 步骤 $#process$
 
 1. 如果文章包含 issue 链接，先查看 issue。
-2. 点击 `编辑` 并阐述结构。
+2. 点击编辑并阐述结构。
 3. 提交 PR 修改。
 
-## YAML 文件顶部信息(frontmatter) $#yaml-frontmatter$
+## YAML 文件顶部信息 $#yaml-frontmatter$
 
 每篇文章的顶部都包含一小部分 [YAML Frontmatter](https://jekyllrb.com/docs/frontmatter/) 格式的内容：
 
@@ -35,28 +36,30 @@ related:
 
 让我们来逐个分析：
 
-- `title`: 文章的名称。
-- `group`: 小节的名称。
-- `sort`: 这篇文章在此类（或子类）中的顺序（如果存在同类）。
-- `contributors`: 文章贡献者的 GitHub 用户名列表。
-- `related`: 任何相关阅读或有用示例。
+- `title`：文章的名称。
+- `group`：小节的名称。
+- `sort`：这篇文章在此类（或子类）中的顺序（如果存在同类）。
+- `contributors`：文章贡献者的 GitHub 用户名列表。
+- `related`：任何相关阅读或有用示例。
 
 请注意，`related` 将在页面底部生成 **Further Reading** 部分，`contributors` 将在其下生成 **Contributors** 部分。如果你编辑了一篇文章，并希望获得认可，请不要犹豫，将你的 GitHub 用户名添加到 `contributors` 列表中。
 
 ## 文章结构 $#article-structure$
 
-1. 简介 - 一两个段落，以便你了解关于什么和为什么的基本想法。
-2. 概述剩余内容 - 将如何呈现内容。
-3. 主要内容 - 讲述你承诺要讲的内容。
-4. 结论 - 讲述你讲了什么并复述要点。
+1. 简介 —— 一两个段落，以便你了解关于什么和为什么的基本想法。
+2. 概述剩余内容 —— 将如何呈现内容。
+3. 主要内容 —— 讲述你承诺要讲的内容。
+4. 结论 —— 讲述你讲了什么并复述要点。
 
 ## 排版 $#typesetting$
 
-- Webpack 作为句子的第一个单词时，W 可以大写。([source](https://github.com/webpack/media#name))
+- Webpack 作为句子的第一个单词时，W 可以大写。参考 [source](https://github.com/webpack/media#name) 以了解更多。
 - loader 应当用反引号包裹，并且使用 [kebab-cased](https://en.wikipedia.org/w/index.php?title=Kebab_case)：`css-loader`，`ts-loader`，……
 - plugin 应当用反引号包裹，并且使用 [camel-cased](https://en.wikipedia.org/wiki/Camel_case): `BannerPlugin`， `NpmInstallWebpackPlugin`，……
 - 使用 "webpack 2" 指代特定的 webpack 版本 (~~"webpack v2"~~)
 - 使用 ES5; ES2015, ES2016, …… 指代 ECMAScript 标准 (~~ES6~~, ~~ES7~~)
+
+> 译者注：中文文档排版规范不必依照于此。
 
 ## 格式化 $#formatting$
 
@@ -109,9 +112,9 @@ foo();
 
 表格也应该按字母顺序排序。
 
-### 配置(configuration)属性 $#configuration-properties$
+### 配置属性 $#configuration-properties$
 
-[配置(configuration)](/configuration) 属性，应该按字母顺序排序：
+[配置](/configuration) 属性，应该按字母顺序排序：
 
 - `devServer.compress`
 - `devServer.hot`
@@ -125,7 +128,7 @@ foo();
 
 > 这是一个引用块。
 
-#### 提示(tip) $#tip$
+#### 提示 $#tip$
 
 **语法：T\>**
 
@@ -139,7 +142,7 @@ W> 这是一个警告。
 
 ?> 这是一个 todo 待办项。
 
-### 假设以及简单(assumptions and simplicity) $#assumptions-and-simplicity$
+### 假设与详略 $#assumptions-and-simplicity$
 
 写文档时，不要做假设：
 
@@ -148,7 +151,7 @@ W> 这是一个警告。
 + 我们在 [production guide](/guides/production/) 学习过……
 ```
 
-请不要假设事情简单。避免使用词汇 '只是'('just')，'简单地'('simply')。
+请不要假设事情简单。避免使用词汇“只是”，“简单地”。
 
 ```diff
 - 简单地运行命令……
