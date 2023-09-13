@@ -8,13 +8,14 @@ contributors:
   - chenxsan
 translators:
   - jsbugwang
+  - Yucohny
 ---
 
-部署 webpack 的发布流程实际上非常简单。请阅读以下步骤，以便清楚了解这些是如何完成的。
+部署 webpack 的发布流程实际上非常简单。请阅读以下步骤，以了解清楚这些是如何完成的。
 
-## 拉取请求(pull request) $#pull-requests$
+## 拉取请求（pull request） $#pull-requests$
 
-当你向 `main` 分支上提交 pull request 时，选择 _Create Merge Commit_ 选项。
+当向 `main` 分支上提交 pull request 时，选择 **Create Merge Commit** 选项。
 
 
 ## 发布 $#releasing$
@@ -25,6 +26,6 @@ npm version minor && git push --follow-tags && npm publish
 npm version major && git push --follow-tags && npm publish
 ```
 
-_这样将递增包版本号，提交变更，然后创建一个**本地标签(tag)**，并推送到 github 和发布到 npm package。_
+**这样将递增包版本号，提交变更，然后创建一个本地标签（tag），并推送到 GitHub，然后发布到 npm package**。
 
-之后就可以到 github 的 [发布页面](https://github.com/webpack/webpack/releases) 上为新的标签(tag)编写 Changelog。
+之后就可以到 GitHub 的 [发布页面](https://github.com/webpack/webpack/releases) 上为新的标签（tag）编写 Changelog。
