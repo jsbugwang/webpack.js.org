@@ -50,7 +50,7 @@ NormalModuleFactory.hooks.someHook.for('identifier').tap(/* ... */);
 
 - 回调参数：`resolveData`
 
-### resolveForScheme $#resolveForScheme$
+### resolveForScheme $#resolveforscheme$
 
 `AsyncSeriesBailHook`
 
@@ -58,7 +58,7 @@ NormalModuleFactory.hooks.someHook.for('identifier').tap(/* ... */);
 
 - 回调参数：`resolveData`
 
-### afterResolve $#afterResolve$
+### afterResolve $#afterresolve$
 
 `AsyncSeriesBailHook`
 
@@ -66,7 +66,7 @@ NormalModuleFactory.hooks.someHook.for('identifier').tap(/* ... */);
 
 - 回调参数：`resolveData`
 
-### createModule $#createModule$
+### createModule $#createmodule$
 
 `AsyncSeriesBailHook`
 
@@ -82,11 +82,11 @@ NormalModuleFactory.hooks.someHook.for('identifier').tap(/* ... */);
 
 - 回调参数：`module` `createData` `resolveData`
 
-### createParser $#createParser$
+### createParser $#createparser$
 
 `HookMap<SyncBailHook>`
 
-在 `Parser` 实例创建后调用。`parserOptions` 是 [module.parser](/configuration/module/#moduleparser) 中对应标识符或空对象的选项。
+在 `Parser` 实例创建之前调用。`parserOptions` 是 [module.parser](/configuration/module/#moduleparser) 中对应标识符或空对象的选项。
 
 - 钩子参数：`identifier`
 
@@ -112,11 +112,11 @@ NormalModuleFactory.hooks.someHook.for('identifier').tap(/* ... */);
 6. `webassembly/async`
 7. `asset`
 
-### createGenerator $#createGenerator$
+### createGenerator $#creategenerator$
 
 `HookMap<SyncBailHook>`
 
-在 `Generator` 实例创建后调用。`generatorOptions` 是 [module.parser](/configuration/module/#modulegenerator) 中对应标识符或空对象的选项。
+在 `Generator` 实例创建之前调用。`generatorOptions` 是 [module.parser](/configuration/module/#modulegenerator) 中对应标识符或空对象的选项。
 
 - 钩子参数：`identifier`
 

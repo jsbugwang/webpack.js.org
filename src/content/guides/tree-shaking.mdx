@@ -131,7 +131,7 @@ module.exports = {
 });
 ```
 
-注意，上面的 `unused harmony export square` 注释。如果你观察它下面的代码，你会注意到虽然我们没有引用 `square`，但它仍然被包含在 bundle 中。我们将在下一节解决这个问题。
+注意，上面的 `unused harmony export square` 注释。如果你观察它下面的代码，你会注意到虽然我们没有引用 `square`，但它仍然被包含在 bundle 中。我们将在后面的章节解决这个问题。
 
 ## 将文件标记为 side-effect-free(无副作用) $#mark-the-file-as-side-effect-free$
 
@@ -317,7 +317,7 @@ export { default as ButtonGroup } from './ButtonGroup';
 
 ## 将函数调用标记为无副作用 $#mark-a-function-call-as-side-effect-free$
 
-是可以告诉 webpack 一个函数调用是无副作用的，只要通过 `/*#__PURE__*/` 注释。它可以被放到函数调用之前，用来标记它们是无副作用的(pure)。传到函数中的入参是无法被刚才的注释所标记，需要单独每一个标记才可以。如果一个没被使用的变量定义的初始值被认为是无副作用的（pure），它会被标记为死代码，不会被执行且会被压缩工具清除掉。这个行为被会开启当 [`optimization.innerGraph`](/configuration/optimization/#optimizationinnergraph) 被设置成 `true`。
+是可以告诉 webpack 一个函数调用是无副作用的，只要通过 `/*#__PURE__*/` 注释。它可以被放到函数调用之前，用来标记它们是无副作用的(pure)。传到函数中的入参是无法被刚才的注释所标记，需要单独每一个标记才可以。如果一个没被使用的变量定义的初始值被认为是无副作用的（pure），它会被标记为死代码，不会被执行且会被压缩工具清除掉。当 [`optimization.innerGraph`](/configuration/optimization/#optimizationinnergraph) 被设置成 `true` 时这个行为会被启用。
 
 **file.js**
 

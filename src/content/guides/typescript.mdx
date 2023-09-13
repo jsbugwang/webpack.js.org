@@ -12,15 +12,16 @@ contributors:
 translators:
   - QC-L
   - lcxfs1991
+  - Yucohny
 ---
 
-T> 本指南继续沿用 [_起步_](/guides/getting-started/) 中的代码示例。
+T> 本指南继续沿用 **[起步](/guides/getting-started/)** 中的代码示例。
 
-[TypeScript](https://www.typescriptlang.org) 是 JavaScript 的超集，为其增加了类型系统，可以编译为普通 JavaScript 代码。这篇指南里我们将会学习是如何将 webpack 和 TypeScript 进行集成。
+[TypeScript](https://www.typescriptlang.org) 是 JavaScript 的超集，为其增加了类型系统。TypeScript 可以被编译为普通的 JavaScript 代码。这篇指南将会介绍如何在 webpack 中集成 TypeScript。
 
 ## 基础配置 $#basic-setup$
 
-首先，执行以下命令安装 TypeScript compiler 和 loader：
+首先，执行以下命令安装 TypeScript 编译器和 loader：
 
 ```bash
 npm install --save-dev typescript ts-loader
@@ -47,7 +48,7 @@ npm install --save-dev typescript ts-loader
 
 **tsconfig.json**
 
-这里我们设置一个基本的配置来支持 JSX，并将 TypeScript 编译到 ES5……
+这里我们添加一个基本的配置以支持 JSX，并将 TypeScript 编译到 ES5……
 
 ```json
 {
@@ -63,9 +64,9 @@ npm install --save-dev typescript ts-loader
 }
 ```
 
-查看 [TypeScript 官方文档](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html) 了解更多关于 `tsconfig.json` 的配置选项。
+参阅 [TypeScript 官方文档](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html) 了解更多关于 `tsconfig.json` 配置选项的信息。
 
-想要了解 webpack 配置的更多信息，请查看 [配置](/concepts/configuration/) 概念。
+参阅 [配置](/concepts/configuration/) 了解更多关于 webpack 配置的信息。
 
 现在，配置 webpack 处理 TypeScript：
 
@@ -95,10 +96,9 @@ module.exports = {
 };
 ```
 
-这会让 webpack 直接从 `./index.ts` _进入_，然后通过 `ts-loader` *加载*所有的 `.ts` 和 `.tsx` 文件，并且在当前目录*输出*一个 `bundle.js` 文件。
+上面的配置将会指定 `./src/index.ts` 为入口文件，并通过 `ts-loader` 加载所有 `.ts` 和 `.tsx` 文件，并在当前目录 **输出** 一个 `bundle.js` 文件。
 
-现在让我们改变 `lodash` 在 `./index.ts` 文件中的引入，
-因为在 `lodash` 的定义中没有默认(default)的导出。
+由于 `lodash` 没有默认导出，因此现在需要修改 `lodash` 在 `./index.ts` 文件中的引入。
 
 **./index.ts**
 
@@ -117,23 +117,23 @@ module.exports = {
   document.body.appendChild(component());
 ```
 
-T> 如果想在 TypeScript 中保留如`import _ from 'lodash';`的语法被让它作为一种默认的导入方式，需要在文件 **tsconfig.json** 中设置 `"allowSyntheticDefaultImports" : true` 和 `"esModuleInterop" : true` 。这个是与 TypeScript 相关的配置，在本文档中提及仅供参考。
+T> 如果想在 TypeScript 中继续使用像 `import _ from 'lodash';` 的语法，让它被作为一种默认的导入方式，需要在 **tsconfig.json** 中设置 `"allowSyntheticDefaultImports" : true` 和 `"esModuleInterop" : true`。这是与 TypeScript 相关的配置，在本文档中提及仅供参考。
 
-## Loader $#loader$
+## loader $#loader$
 
 [`ts-loader`](https://github.com/TypeStrong/ts-loader)
 
 在本指南中，我们使用 `ts-loader`，因为它能够很方便地启用额外的 webpack 功能，例如将其他 web 资源导入到项目中。
 
-W> `ts-loader` uses `tsc`, the TypeScript compiler, and relies on your `tsconfig.json` configuration. Make sure to avoid setting [`module`](https://www.typescriptlang.org/tsconfig#module) to "CommonJS", or webpack won't be able to [tree-shake your code](/guides/tree-shaking).
+W> `ts-loader` 使用 TypeScript 编译器 `tsc`，并依赖于 `tsconfig.json` 配置。请确保避免将 [`module`](https://www.typescriptlang.org/tsconfig#module) 设置为 `"CommonJS"`，否则 webpack 将无法对代码进行 [tree shaking](/guides/tree-shaking)。
 
-Note that if you're already using [`babel-loader`](https://github.com/babel/babel-loader) to transpile your code, you can use [`@babel/preset-typescript`](https://babeljs.io/docs/en/babel-preset-typescript) and let Babel handle both your JavaScript and TypeScript files instead of using an additional loader. Keep in mind that, contrary to `ts-loader`, the underlying [`@babel/plugin-transform-typescript`](https://babeljs.io/docs/en/babel-plugin-transform-typescript) plugin does not perform any type checking.
+请注意，如果已经使用 [`babel-loader`](https://github.com/babel/babel-loader) 转译代码，可以使用 [`@babel/preset-typescript`](https://babeljs.io/docs/en/babel-preset-typescript) 以让 Babel 处理 JavaScript 和 TypeScript 文件，而不需要额外使用 loader。请记住，与 `ts-loader` 相反，底层的 [`@babel/plugin-transform-typescript`](https://babeljs.io/docs/en/babel-plugin-transform-typescript) 插件不执行任何类型检查。
 
-## Source Maps $#source-maps$
+## source map $#source-maps$
 
-想要了解 source map 的更多信息，请查看 [开发](/guides/development) 指南。
+参阅 [开发环境](/guides/development) 指南了解更多关于 source map 的信息。
 
-想要启用 source map，我们必须配置 TypeScript，以将内联的 source map 输出到编译后的 JavaScript 文件中。必须在 TypeScript 配置中添加下面这行：
+我们需要对 TypeScript 进行配置以启用 source map，从而实现将内联的 source map 输出到编译后的 JavaScript 文件。必须在 TypeScript 配置中添加下面这行：
 
 **tsconfig.json**
 
@@ -183,30 +183,30 @@ Note that if you're already using [`babel-loader`](https://github.com/babel/babe
 
 查看 [devtool](/configuration/devtool/) 文档以了解更多信息。
 
-## Client types $#client-types$
+## 客户端类型 $#client-types$
 
-你可以在 TypeScript 代码中使用 webpack 特定的特性，比如 [`import.meta.webpack`](/api/module-variables/#importmetawebpack)。并且 webpack 也会为它们提供类型支持，只需要添加一个 TypeScript [`reference`](https://www.typescriptlang.org/docs/handbook/triple-slash-directives.html#-reference-types-) 声明：
+你可以在 TypeScript 代码中使用 webpack 特定的特性，比如 [`import.meta.webpack`](/api/module-variables/#importmetawebpack)。只需要添加 TypeScript [`reference`](https://www.typescriptlang.org/docs/handbook/triple-slash-directives.html#-reference-types-) 声明，webpack 便会为它们提供类型支持：
 
 ```ts
 /// <reference types="webpack/module" />
 console.log(import.meta.webpack); // 没有上面的声明的话，TypeScript 会抛出一个错误
 ```
 
-## 使用第三方类库 $#using-third-party-libraries$
+## 使用第三方库 $#using-third-party-libraries$
 
-在从 npm 安装 third party library(第三方库) 时，一定要记得同时安装此 library 的类型声明文件(typing definition)。你可以从 [TypeSearch](https://microsoft.github.io/TypeSearch/) 中找到并安装这些第三方库的类型声明文件。
+在从 npm 安装第三方库时，一定要记得同时安装此库的类型声明文件。你可以从 [TypeSearch](https://microsoft.github.io/TypeSearch/) 中找到并安装这些第三方库的类型声明文件。
 
-举个例子，如果想安装 lodash 类型声明文件，我们可以运行下面的命令：
+举个例子，如果想安装 lodash 类型声明文件，可以运行下面的命令：
 
 ```bash
 npm install --save-dev @types/lodash
 ```
 
-想了解更多，可以查看 [这篇文章](https://blogs.msdn.microsoft.com/typescript/2016/06/15/the-future-of-declaration-files/)。
+参与 [这篇文章](https://blogs.msdn.microsoft.com/typescript/2016/06/15/the-future-of-declaration-files/) 以了解更多。
 
 ## 导入其他资源 $#importing-other-assets$
 
-想要在 TypeScript 中使用非代码资源(non-code asset)，我们需要告诉 TypeScript 推断导入资源的类型。在项目里创建一个 `custom.d.ts` 文件，这个文件用来表示项目中 TypeScript 的自定义类型声明。我们为 `.svg` 文件设置一个声明：
+想要在 TypeScript 中使用非代码资源，需要告诉 TypeScript 推断导入资源的类型。在项目里创建一个 `custom.d.ts` 文件，这个文件用来表示项目中 TypeScript 的自定义类型声明。我们为 `.svg` 文件设置一个声明：
 
 **custom.d.ts**
 
@@ -217,10 +217,10 @@ declare module '*.svg' {
 }
 ```
 
-H 这里，我们通过指定任何以 `.svg` 结尾的导入(import)，将 SVG 声明(declare) 为一个新的模块(module)，并将模块的 `content` 定义为 `any`。我们可以通过将类型定义为字符串，来更加显式地将它声明为一个 url。同样的概念适用于其他资源，包括 CSS, SCSS, JSON 等。
+在这里我们通过指定任何以 `.svg` 结尾的导入，将 SVG 声明为一个新的模块，并将模块的 `content` 定义为 `any`。我们可以通过将类型定义为字符串，来更加显式地将它声明为一个 url。同样的概念适用于其他资源，包括 CSS，SCSS，以及 JSON 等。
 
 ## 构建性能 $#build-performance$
 
-W> 这可能会降低构建性能。
+W> 这么做可能会降低构建性能。
 
-关于构建工具，请查看[构建性能](/guides/build-performance/)指南。
+参阅 [构建性能](/guides/build-performance/) 以了解更多关于构建性能的信息。
